@@ -1,5 +1,5 @@
 #include "CloudflareScraper.h"
-#include "CloudFlareUnexpectedException.h"
+#include "CloudFlareException.h"
 #include "Logger.h"
 #include <algorithm>
 #include <ctime>
@@ -33,7 +33,12 @@ QString CloudflareScraper::getUA() const{
     return *m_current_ua;
 }
 
-CloudflareScraper::CloudflareScraper(Cookies *cookies, QObject *parent) : QObject(parent), m_cookies(cookies), m_am(new QNetworkAccessManager(this)){
+CloudflareScraper::CloudflareScraper(Cookies *cookies, QObject *parent, QDir const& v8_path) :
+    QObject(parent),
+    m_cookies(cookies),
+    m_am(new QNetworkAccessManager(this)),
+    _v8_path(v8_path)
+{
     m_current_ua_n = random(0, (sizeof RANDOM_UA / sizeof *RANDOM_UA) - 1);
     m_current_ua = &RANDOM_UA[m_current_ua_n]; // Set a random user-agent
     m_am->setCookieJar(m_cookies);
@@ -49,7 +54,7 @@ CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareS
 void CloudflareScraper::get(QUrl const &url, bool force){
 
     if(m_cookies.isNull())
-        throw CloudFlareUnexpectedException{};
+        throw CloudFlareException{"No cookies jar provided"};
 
     if(m_busy && !force) return; // Do not accept requests while still processing one
 
@@ -127,15 +132,15 @@ QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
     auto process = QPointer<QProcess> (new QProcess(this));
 
 #ifdef Q_OS_WIN32
-    QString google_v8{QDir(qApp->applicationDirPath()).absoluteFilePath("d8.exe")};
+    QString google_v8{_v8_path.absoluteFilePath("d8.exe")};
 #else
-    QString google_v8{QDir(qApp->applicationDirPath()).absoluteFilePath("d8")};
+    QString google_v8{_v8_path.absoluteFilePath("d8")};
 #endif
 
     {
         QFile f{google_v8};
         if(!f.exists()){
-            throw CloudFlareUnexpectedException{};
+            throw CloudFlareException{QString{"Google v8 not found in " + qApp->applicationDirPath()}.toStdString()};
         }
     }
 
@@ -173,12 +178,12 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     QString pass = regex.cap(1);
 
     if(jschl_vc.isEmpty() || pass.isEmpty()){
-        throw CloudFlareUnexpectedException();
+        throw CloudFlareException{"Unexpected exception, maybe cloudflare's changed its method"};
     }
 
     QNetworkCookie const* cfduid_cookie = m_cookies->getCookie("__cfduid");
     if(cfduid_cookie == 0){
-        throw CloudFlareUnexpectedException();
+        throw CloudFlareException{"Didn't get __cfduid cookie"};
     }
 
     m_secret_token += host.length();

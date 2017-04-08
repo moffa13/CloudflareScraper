@@ -25,13 +25,12 @@ DESTDIR = $$PWD/bin/
 
 SOURCES += $$PWD/CloudflareScraper.cpp \
         $$PWD/Cookies.cpp \
-        $$PWD/CloudFlareUnexpectedException.cpp \
         $$PWD/Logger.cpp \
         $$PWD/main.cpp
 
 HEADERS += $$PWD/CloudflareScraper.h \
         $$PWD/Cookies.h \
-        $$PWD/CloudFlareUnexpectedException.h \
+        $$PWD/CloudFlareException.h \
         $$PWD/CloudflareScraper_export.h \
         $$PWD/Logger.h
 

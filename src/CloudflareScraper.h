@@ -11,6 +11,7 @@
 #include "Cookies.h"
 #include "CloudflareScraper_export.h"
 #include <QPointer>
+#include <QDir>
 
 #ifndef NO_DLL
 class DLL_API CloudflareScraper : public QObject
@@ -22,7 +23,7 @@ class CloudflareScraper : public QObject
     Q_OBJECT
 
     public:
-        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr);
+        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir("."));
         CloudflareScraper(CloudflareScraper const& rhs);
         void get(QUrl const &url, bool force = false);
         inline void get() { get(m_last_url); }
@@ -51,6 +52,7 @@ class CloudflareScraper : public QObject
         void hack(QUrl const &url, QByteArray const& resp);
         QString getJSAlgorithm(QByteArray const &raw);
         static unsigned random(unsigned a, unsigned b);
+        QDir _v8_path;
     Q_SIGNALS:
         void success(QNetworkReply*, QByteArray const &content);
         void error();
