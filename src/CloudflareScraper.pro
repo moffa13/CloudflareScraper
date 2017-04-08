@@ -1,16 +1,9 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-04-08T19:40:02
-#
-#-------------------------------------------------
-
-QT       -= gui
-QT		 += network
+QT -= gui
+QT += network
 
 TARGET = CloudflareScraper
 
-
-DEFINES += NO_DLL DLL_EXPORT
+DEFINES += NO_DLL
 DEFINES += QT_DEPRECATED_WARNINGS
 
 contains(DEFINES, NO_DLL){
