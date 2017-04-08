@@ -2,4 +2,4 @@ src/CloudflareScraper.pro.user
 src/Makefile*
 src/debug
 src/release
-bin/*
+src/bin/*
