@@ -13,11 +13,11 @@ int main(int argc, char* argv[]){
 
 #ifdef Q_OS_WIN
     v8_base.cd("windows");
-    CloudflareScraper scraper{&c, nullptr, v8_base};
 #else
     v8_base.cd("linux");
-    CloudflareScraper scraper{&c, nullptr, QDir{"../../third-party/linux"}};
 #endif
+
+    CloudflareScraper scraper{&c, nullptr, v8_base};
 
     QObject::connect(&scraper, &CloudflareScraper::success, [](QNetworkReply* reply, QByteArray const& content){
        qDebug() << "Got response";
