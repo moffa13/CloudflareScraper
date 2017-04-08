@@ -1,0 +1,2 @@
+# CloudflareScraper
+C++ Cloudflare scraper
