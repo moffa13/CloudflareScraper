@@ -1,7 +1,7 @@
-#include <QCoreApplication>
-#include <QObject>
 #include "CloudflareScraper.h"
 #include "Cookies.h"
+#include <QCoreApplication>
+#include <QObject>
 
 int main(int argc, char* argv[]){
     QCoreApplication app(argc, argv);

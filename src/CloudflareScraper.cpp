@@ -6,12 +6,12 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QNetworkCookie>
+#include <QRegExp>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QRegularExpressionMatchIterator>
 #include <QString>
 #include <QStringList>
-#include <QRegExp>
 #include <QThread>
 #include <QUrlQuery>
 

@@ -1,18 +1,18 @@
 #ifndef CLOUDFLARESCRAPER_H
 #define CLOUDFLARESCRAPER_H
 
+#include "CloudflareScraper_export.h"
+#include "Cookies.h"
+#include "Logger.h"
+#include <memory>
 #include <QByteArray>
+#include <QDir>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QObject>
+#include <QPointer>
 #include <QProcess>
 #include <QString>
-#include <memory>
-#include "Cookies.h"
-#include "CloudflareScraper_export.h"
-#include <QPointer>
-#include <QDir>
-#include "Logger.h"
 
 #ifndef NO_DLL
 class DLL_API CloudflareScraper : public QObject
