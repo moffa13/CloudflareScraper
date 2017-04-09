@@ -1,9 +1,6 @@
 #include "Cookies.h"
 
-Cookies::Cookies(QObject *parent) : QNetworkCookieJar(parent)
-{
-
-}
+Cookies::Cookies(QObject *parent) : QNetworkCookieJar(parent) {}
 
 QNetworkCookie const* Cookies::getCookie(QString name) const{
     auto cookies = allCookies();

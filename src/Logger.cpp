@@ -1,25 +1,13 @@
 #include "Logger.h"
 #include <iostream>
+#include <QCoreApplication>
 #include <QDateTime>
 #include <QFile>
 #include <QTextStream>
-#include <QCoreApplication>
 
 using namespace std;
 
 int Logger::_log_level = DEBUG;
-
-QDateTime Logger::getDateTime(){
-    return QDateTime::currentDateTime();
-}
-
-QString Logger::getDateFormatted(){
-    return Logger::getDateTime().toString("yyyy-MM-dd hh:mm:ss");
-}
-
-void Logger::setLogLevel(int level){
-    _log_level = level;
-}
 
 void Logger::write(QString const &prefix, QString const &message, int act){
 

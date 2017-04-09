@@ -17,13 +17,16 @@ enum LOGLEVEL{
     DEBUG = 3
 };
 
-
 class Logger
 {
     public:
-        static QDateTime getDateTime();
-        static QString getDateFormatted();
-        static void setLogLevel(int level);
+        static inline QDateTime getDateTime(){
+            return QDateTime::currentDateTime();
+        }
+        static inline QString getDateFormatted(){
+            return Logger::getDateTime().toString("yyyy-MM-dd hh:mm:ss");
+        }
+        static inline void setLogLevel(int level){ log_level = level; }
         static void write(QString const &prefix, QString const &message, int act);
         static void error(QString const &message, int act = PRINT);
         static void warn(QString const &message, int act = PRINT);
