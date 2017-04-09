@@ -1,5 +1,5 @@
 #include "CloudflareScraper.h"
-#include "CloudFlareException.h"
+#include "CloudflareException.h"
 #include "Logger.h"
 #include <algorithm>
 #include <ctime>
@@ -70,7 +70,7 @@ CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareS
 void CloudflareScraper::get(QUrl const &url, bool force){
 
     if(m_cookies.isNull())
-        throw CloudFlareException{"No cookies jar provided"};
+        throw CloudflareException{"No cookies jar provided"};
 
     if(m_busy && !force) return; // Do not accept requests while still processing one
 
@@ -156,7 +156,7 @@ QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
     {
         QFile f{google_v8};
         if(!f.exists()){
-            throw CloudFlareException{QString{"Google v8 not found in " + qApp->applicationDirPath()}.toStdString()};
+            throw CloudflareException{QString{"Google v8 not found in " + qApp->applicationDirPath()}.toStdString()};
         }
     }
 
@@ -194,12 +194,12 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     QString pass = regex.cap(1);
 
     if(jschl_vc.isEmpty() || pass.isEmpty()){
-        throw CloudFlareException{"Unexpected exception, maybe cloudflare's changed its method"};
+        throw CloudflareException{"Unexpected exception, maybe cloudflare's changed its method"};
     }
 
     QNetworkCookie const* cfduid_cookie = m_cookies->getCookie("__cfduid");
     if(cfduid_cookie == 0){
-        throw CloudFlareException{"Didn't get __cfduid cookie"};
+        throw CloudflareException{"Didn't get __cfduid cookie"};
     }
 
     m_secret_token += host.length();
