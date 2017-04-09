@@ -26,7 +26,7 @@ class Logger
         static inline QString getDateFormatted(){
             return Logger::getDateTime().toString("yyyy-MM-dd hh:mm:ss");
         }
-        static inline void setLogLevel(int level){ log_level = level; }
+        static inline void setLogLevel(int level){ _log_level = level; }
         static void write(QString const &prefix, QString const &message, int act);
         static void error(QString const &message, int act = PRINT);
         static void warn(QString const &message, int act = PRINT);
