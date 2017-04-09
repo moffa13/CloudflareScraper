@@ -26,6 +26,8 @@ class CloudflareScraper : public QObject
     public:
         CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir("."));
         CloudflareScraper(CloudflareScraper const& rhs);
+        inline void addUA(QString const& ua, bool update = true){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
+        inline void removeUA(QString const& ua, bool update = true) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }
         void get(QUrl const &url, bool force = false);
         inline void get() { get(m_last_url); }
         inline QUrl getLastUrl() const { return m_last_url; }
@@ -33,21 +35,19 @@ class CloudflareScraper : public QObject
             m_cookies = cookies;
             m_am->setCookieJar(m_cookies);
         }
-        inline quint8 getRandomUaN() const{ return m_current_ua_n; }
-        inline void setRandomUaN(quint8 n){ m_current_ua_n = n; m_current_ua = &RANDOM_UA[m_current_ua_n]; }
         inline QPointer<Cookies> getCookies() const { return m_cookies; }
         inline bool isBusy() const { return m_busy; }
         static inline void setLogLevel(int level) { Logger::setLogLevel(level); }
     private:
-        static const QString RANDOM_UA[];
+        static QSet<QString> RANDOM_UA_LIST;
+        QString _current_ua;
+        void setRandomUA();
         QPointer<QNetworkAccessManager> m_am;
         void follow_replies(QNetworkReply* reply);
         QUrl m_last_url;
         bool m_busy = false;
         QDir _v8_path;
         QPointer<Cookies> m_cookies;
-        QString const *m_current_ua;
-        quint8 m_current_ua_n;
         bool m_follow_redirects = true;
         long m_secret_token = 0;
         QString getUA() const;

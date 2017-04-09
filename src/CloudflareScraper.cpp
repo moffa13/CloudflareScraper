@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include <algorithm>
 #include <ctime>
+#include <iterator>
 #include <QCoreApplication>
 #include <QDir>
 #include <QNetworkCookie>
@@ -15,13 +16,19 @@
 #include <QThread>
 #include <QUrlQuery>
 
-const QString CloudflareScraper::RANDOM_UA[] = {
+QSet<QString> CloudflareScraper::RANDOM_UA_LIST = {
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
     "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
 };
 
+/**
+ * Returns a number between a and b, which are included
+ * @brief CloudflareScraper::random
+ * @param a
+ * @param b
+ */
 unsigned CloudflareScraper::random(unsigned a, unsigned b){
     srand(time(0));
     unsigned min = std::min(a, b);
@@ -30,7 +37,7 @@ unsigned CloudflareScraper::random(unsigned a, unsigned b){
 }
 
 QString CloudflareScraper::getUA() const{
-    return *m_current_ua;
+    return _current_ua;
 }
 
 CloudflareScraper::CloudflareScraper(Cookies *cookies, QObject *parent, QDir const& v8_path) :
@@ -39,13 +46,22 @@ CloudflareScraper::CloudflareScraper(Cookies *cookies, QObject *parent, QDir con
     m_am(new QNetworkAccessManager(this)),
     _v8_path(v8_path)
 {
-    m_current_ua_n = random(0, (sizeof RANDOM_UA / sizeof *RANDOM_UA) - 1);
-    m_current_ua = &RANDOM_UA[m_current_ua_n]; // Set a random user-agent
+    setRandomUA(); // Set a random user-agent
+    Logger::log(DEBUG, "Using useragent: " + _current_ua);
     m_am->setCookieJar(m_cookies);
 }
 
+void CloudflareScraper::setRandomUA(){
+
+    auto size = RANDOM_UA_LIST.size();
+    auto rand = random(0, size - 1);
+    QSet<QString>::iterator it = RANDOM_UA_LIST.begin() + rand;
+    _current_ua = *it;
+
+}
+
 CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareScraper(){
-    setRandomUaN(rhs.getRandomUaN());
+    _current_ua = rhs._current_ua;
     Cookies *c = new Cookies(this);
     c->setAllCookies(rhs.getCookies()->getAllCookies());
     setCookies(c);
