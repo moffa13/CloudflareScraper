@@ -23,7 +23,7 @@ SOURCES += $$PWD/CloudflareScraper.cpp \
 
 HEADERS += $$PWD/CloudflareScraper.h \
         $$PWD/Cookies.h \
-        $$PWD/CloudFlareException.h \
+        $$PWD/CloudflareException.h \
         $$PWD/CloudflareScraper_export.h \
         $$PWD/Logger.h
 
