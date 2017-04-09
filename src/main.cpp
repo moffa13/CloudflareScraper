@@ -17,10 +17,12 @@ int main(int argc, char* argv[]){
     v8_base.cd("linux");
 #endif
 
+    CloudflareScraper::setLogLevel(WARN);
     CloudflareScraper scraper{&c, nullptr, v8_base};
 
     QObject::connect(&scraper, &CloudflareScraper::success, [](QNetworkReply* reply, QByteArray const& content){
        qDebug() << "Got response";
+       qDebug() << "Returned " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
     });
     scraper.get(QUrl("http://www.torrent9.biz/"));
 

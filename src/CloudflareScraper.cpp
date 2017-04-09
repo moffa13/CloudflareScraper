@@ -99,11 +99,11 @@ void CloudflareScraper::gotResponse(QNetworkReply* reply){
 
     if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 503
             && content.contains("jschl_vc") && content.contains("jschl_answer")){
-        Logger::info("It is secured with cloudflare !");
-        Logger::info("Bypassing...");
+        Logger::log(DEBUG, "It is secured with cloudflare !");
+        Logger::log(DEBUG, "Bypassing...");
         hack(reply->url(), content);
     }else{
-        Logger::info("It is NOT secured !");
+        Logger::log(DEBUG, "It is NOT secured !");
         m_busy = false;
         emit success(reply, content);
     }
@@ -198,7 +198,7 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     r.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
 
-    Logger::info("GET : " + r.url().toString());
+    Logger::log(DEBUG, "GET : " + r.url().toString());
 
     connect(m_am, &QNetworkAccessManager::finished, [this, url](){
 
@@ -209,13 +209,13 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
         for(auto cookie : m_cookies->getAllCookies()){
             if(cookie.name() == "cf_clearance"){
                 endCookie = true;
-                Logger::info("GOT cf_clearance, OK");
+                Logger::log(DEBUG, "GOT cf_clearance, OK");
                 break;
             }
         }
 
         if(!endCookie){
-            Logger::error("Didn't get cf_clearance, failed");
+            Logger::log(ERROR, "Didn't get cf_clearance, failed");
             emit error();
         }
 

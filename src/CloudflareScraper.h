@@ -12,6 +12,7 @@
 #include "CloudflareScraper_export.h"
 #include <QPointer>
 #include <QDir>
+#include "Logger.h"
 
 #ifndef NO_DLL
 class DLL_API CloudflareScraper : public QObject
@@ -36,12 +37,14 @@ class CloudflareScraper : public QObject
         inline void setRandomUaN(quint8 n){ m_current_ua_n = n; m_current_ua = &RANDOM_UA[m_current_ua_n]; }
         inline QPointer<Cookies> getCookies() const { return m_cookies; }
         inline bool isBusy() const { return m_busy; }
+        static inline void setLogLevel(int level) { Logger::setLogLevel(level); }
     private:
         static const QString RANDOM_UA[];
         QPointer<QNetworkAccessManager> m_am;
         void follow_replies(QNetworkReply* reply);
         QUrl m_last_url;
         bool m_busy = false;
+        QDir _v8_path;
         QPointer<Cookies> m_cookies;
         QString const *m_current_ua;
         quint8 m_current_ua_n;
@@ -52,7 +55,6 @@ class CloudflareScraper : public QObject
         void hack(QUrl const &url, QByteArray const& resp);
         QString getJSAlgorithm(QByteArray const &raw);
         static unsigned random(unsigned a, unsigned b);
-        QDir _v8_path;
     Q_SIGNALS:
         void success(QNetworkReply*, QByteArray const &content);
         void error();

@@ -7,12 +7,18 @@
 
 using namespace std;
 
+int Logger::_log_level = DEBUG;
+
 QDateTime Logger::getDateTime(){
     return QDateTime::currentDateTime();
 }
 
 QString Logger::getDateFormatted(){
     return Logger::getDateTime().toString("yyyy-MM-dd hh:mm:ss");
+}
+
+void Logger::setLogLevel(int level){
+    _log_level = level;
 }
 
 void Logger::write(QString const &prefix, QString const &message, int act){
@@ -43,7 +49,7 @@ void Logger::write(QString const &prefix, QString const &message, int act){
 
 }
 
-void Logger::info(QString const &message, int act){
+void Logger::debug(QString const &message, int act){
     Logger::write("Info", message, act);
 }
 
@@ -53,4 +59,24 @@ void Logger::warn(QString const &message, int act){
 
 void Logger::error(QString const &message, int act){
     Logger::write("ERROR", message, act);
+}
+
+void Logger::log(int log_level, const QString &message, int act){
+
+    if(_log_level < log_level) return;
+
+    switch (log_level) {
+        case ERROR:
+            error(message, act);
+            break;
+        case WARN:
+            warn(message, act);
+            break;
+        case DEBUG:
+            debug(message, act);
+            break;
+        default:
+            throw std::runtime_error{"Unknown log level"};
+            break;
+    }
 }
