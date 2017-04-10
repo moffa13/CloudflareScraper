@@ -3,7 +3,7 @@ QT += network
 
 TARGET = CloudflareScraper
 
-DEFINES += NO_DLL
+DEFINES += DLL_EXPORT
 DEFINES += QT_DEPRECATED_WARNINGS
 
 contains(DEFINES, NO_DLL){
