@@ -29,6 +29,7 @@ class CloudflareScraper : public QObject
         CloudflareScraper(CloudflareScraper const& rhs);
         inline void addUA(QString const& ua, bool update = true){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
         inline void removeUA(QString const& ua, bool update = true) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }
+        void setUA(QString const& ua, bool add = false);
         void get(QUrl const &url, bool force = false);
         inline void get() { get(m_last_url); }
         inline QUrl getLastUrl() const { return m_last_url; }

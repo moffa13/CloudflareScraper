@@ -53,12 +53,16 @@ CloudflareScraper::CloudflareScraper(Cookies *cookies, QObject *parent, QDir con
 }
 
 void CloudflareScraper::setRandomUA(){
-
     auto size = RANDOM_UA_LIST.size();
     auto rand = random(0, size - 1);
     QSet<QString>::iterator it = RANDOM_UA_LIST.begin() + rand;
     _current_ua = *it;
+}
 
+void CloudflareScraper::setUA(QString const& ua, bool add){
+    _current_ua = ua;
+    if(add)
+        addUA(ua, false);
 }
 
 CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareScraper(){
