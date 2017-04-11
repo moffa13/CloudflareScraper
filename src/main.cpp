@@ -12,7 +12,7 @@ int main(int argc, char* argv[]){
     Cookies *c = new Cookies;
 
     QDir v8_base{qApp->applicationDirPath()};
-    v8_base.cd("../../third-party/");
+    v8_base.cd("../third-party/");
 
 #ifdef Q_OS_WIN
     v8_base.cd("windows");
