@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <ctime>
 #include <iterator>
+#include <random>
 #include <QCoreApplication>
 #include <QDir>
 #include <QNetworkCookie>
@@ -30,10 +31,10 @@ QSet<QString> CloudflareScraper::RANDOM_UA_LIST = {
  * @param b
  */
 unsigned CloudflareScraper::random(unsigned a, unsigned b){
-    srand(time(0));
-    unsigned min = std::min(a, b);
-    unsigned max = std::max(a, b);
-    return rand() % (max - min + 1) + min;
+    std::mt19937 random_gen;
+    random_gen.seed(std::random_device()());
+    std::uniform_int_distribution<std::mt19937::result_type> rnd(a, b);
+    return rnd(random_gen);
 }
 
 QString CloudflareScraper::getUA() const{
