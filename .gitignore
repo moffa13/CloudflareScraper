@@ -3,4 +3,5 @@ src/Makefile*
 src/debug
 src/release
 src/bin/*
+src/.qmake.stash
 build-*
