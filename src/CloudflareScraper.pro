@@ -9,13 +9,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 contains(DEFINES, NO_DLL){
     TEMPLATE = app
-	DESTDIR = bin
+    DESTDIR = bin
 }else{
     TEMPLATE = lib
-	DESTDIR = bin/lib
+    DESTDIR = bin/lib
 }
 
-CONFIG += c++11
+CONFIG += c++11 console
 
 OBJECTS_DIR = build
 MOC_DIR = build

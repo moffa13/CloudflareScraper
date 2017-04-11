@@ -6,6 +6,7 @@
 #include "Logger.h"
 #include <memory>
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QDir>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -24,7 +25,7 @@ class CloudflareScraper : public QObject
     Q_OBJECT
 
     public:
-        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir("."));
+        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir(QCoreApplication::applicationDirPath()));
         CloudflareScraper(CloudflareScraper const& rhs);
         inline void addUA(QString const& ua, bool update = true){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
         inline void removeUA(QString const& ua, bool update = true) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }

@@ -84,6 +84,7 @@ void CloudflareScraper::get(QUrl const &url, bool force){
     connect(m_am, SIGNAL(finished(QNetworkReply*)), this, SLOT(gotResponse(QNetworkReply*)), Qt::UniqueConnection);
 
     follow_replies(m_am->get(r));
+
 }
 
 /**

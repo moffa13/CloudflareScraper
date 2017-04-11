@@ -16,15 +16,17 @@ void Logger::write(QString const &prefix, QString const &message, int act){
     stream << Logger::getDateFormatted() << " ["+prefix+"] " << message;
     std::string content(stream.string()->toStdString());
 
+    auto &os = (act & ERROR_OUT) ? cerr : cout;
+
     if(act & PRINT){ // Print to the console
         if(act & ERASE)
-            cout << "\r";
-        cout << content.c_str();
+            os << "\r";
+        os << content.c_str();
 
         if(act & ERASE)
-            cout << std::flush;
+            os << std::flush;
         else
-            cout << std::endl << std::flush;
+            os << std::endl << std::flush;
     }else{
         QFile f(qApp->applicationDirPath() + "/error.log");
         if(f.open(QIODevice::WriteOnly | QIODevice::Append)){
@@ -46,6 +48,7 @@ void Logger::warn(QString const &message, int act){
 }
 
 void Logger::error(QString const &message, int act){
+    act |= ERROR_OUT;
     Logger::write("ERROR", message, act);
 }
 

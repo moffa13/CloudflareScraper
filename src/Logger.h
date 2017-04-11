@@ -7,7 +7,8 @@
 enum ACTION{
     ERASE = 1,
     PRINT = 2,
-    PRINT_FILE = 4
+    PRINT_FILE = 4,
+    ERROR_OUT = 8
 };
 
 enum LOGLEVEL{
