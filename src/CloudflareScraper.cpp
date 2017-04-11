@@ -171,6 +171,9 @@ QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
         {
             QFile f{google_v8};
             if(f.exists()){
+                #ifndef Q_OS_WIN32
+                f.setPermissions(f.permissions() | (QFile::ExeUser | QFile::ExeGroup));
+                #endif
                 found = true;
                 break;
             }
