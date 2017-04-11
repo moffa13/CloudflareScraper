@@ -66,6 +66,7 @@ void CloudflareScraper::setUA(QString const& ua, bool add){
 }
 
 CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareScraper(){
+
     _current_ua = rhs._current_ua;
     Cookies *c = new Cookies(this);
     c->setAllCookies(rhs.getCookies()->getAllCookies());
@@ -153,19 +154,32 @@ QString CloudflareScraper::getJSAlgorithm(QByteArray const &raw){
 QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
     auto process = QPointer<QProcess> (new QProcess(this));
 
-#ifdef Q_OS_WIN32
-    QString google_v8{_v8_path.absoluteFilePath("d8.exe")};
-#else
-    QString google_v8{_v8_path.absoluteFilePath("d8")};
-#endif
+    QList<QDir> whereToFind;
+    whereToFind.append(_v8_path);
+    whereToFind.append(QDir(qApp->applicationDirPath()));
 
-    {
-        QFile f{google_v8};
-        if(!f.exists()){
-            throw CloudflareException{QString{"Google v8 not found in " + qApp->applicationDirPath()}.toStdString()};
+    bool found = false;
+    QString google_v8;
+
+    for(QList<QDir>::iterator it = whereToFind.begin(); it != whereToFind.end(); ++it){
+        #ifdef Q_OS_WIN32
+            google_v8 = it->absoluteFilePath("d8.exe");
+        #else
+            google_v8 = it->absoluteFilePath("d8");
+        #endif
+
+        {
+            QFile f{google_v8};
+            if(f.exists()){
+                found = true;
+                break;
+            }
         }
     }
 
+    if(!found){
+        throw CloudflareException{QString{"Google v8 not found"}.toStdString()};
+    }
 
     QStringList args; args << "-e" << js + ";print(res);";
 
