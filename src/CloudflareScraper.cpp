@@ -105,7 +105,9 @@ void CloudflareScraper::gotResponse(QNetworkReply* reply){
     disconnect(m_am, 0, 0, 0);
 
     int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    if(code == 302 || code == 301 || code == 307){
+    auto locationHeader = reply->header(QNetworkRequest::LocationHeader);
+
+    if(locationHeader.isValid()){ // If the location header exists, we have to redirect
         QUrl dest{reply->header(QNetworkRequest::LocationHeader).toUrl()};
         Logger::warn(QString::number(code) + " redirect : " + dest.toString());
         if(dest.toString().isEmpty()){
