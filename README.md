@@ -21,3 +21,10 @@ then run
  or
  
  	make
+	
+
+## CLI
+
+To write the html page into a file, simply do
+
+	CloudflareScraper http://www.******.com/ > result.html 2> error.log
