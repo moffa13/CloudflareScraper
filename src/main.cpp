@@ -1,3 +1,4 @@
+#include "CloudflareException.h"
 #include "CloudflareScraper.h"
 #include "Cookies.h"
 #include "Logger.h"
@@ -30,9 +31,22 @@ int main(int argc, char* argv[]){
         qApp->exit(0);
     });
 
+    QObject::connect(&scraper, &CloudflareScraper::error, [c](QString const& msg, bool recoverable){
+        if(!recoverable){
+            Logger::error("Unrecoverable error : " + msg);
+            qApp->exit(2);
+        }
+    });
+
     QTimer::singleShot(0, [&scraper, argc, argv](){
-        if(argc > 1)
-            scraper.get(QUrl(argv[1]));
+        if(argc > 1){
+            try{
+               scraper.get(QUrl(argv[1]));
+            }catch(CloudflareException &ex){
+                Logger::error(QString("Unrecoverable error : ") + ex.what());
+                qApp->exit(2);
+            }
+        }
         else{
             Logger::error("No url specified, please use CloudflareScraper.exe <url>");
             qApp->exit(1);

@@ -55,11 +55,13 @@ class CloudflareScraper : public QObject
         QString getUA() const;
         QPointer<QProcess> evalJS(QString const &js);
         void hack(QUrl const &url, QByteArray const& resp);
+        void checkForGoogleV8();
         QString getJSAlgorithm(QByteArray const &raw);
+        QString _google_v8;
         static unsigned random(unsigned a, unsigned b);
     Q_SIGNALS:
         void success(QNetworkReply*, QByteArray const &content);
-        void error();
+        void error(QString const& msg = QString(), bool recoverable = false);
     private Q_SLOTS:
         void gotResponse(QNetworkReply*);
 };

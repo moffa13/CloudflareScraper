@@ -78,6 +78,8 @@ void CloudflareScraper::get(QUrl const &url, bool force){
     if(m_cookies.isNull())
         throw CloudflareException{"No cookies jar provided"};
 
+    checkForGoogleV8();
+
     if(m_busy && !force) return; // Do not accept requests while still processing one
 
     m_busy = true;
@@ -93,68 +95,13 @@ void CloudflareScraper::get(QUrl const &url, bool force){
 }
 
 /**
- * Connect every reply and emit error when error signal is emitted
- * @brief follow_replies
+ * Sets _google_v8 to the right executable d8 file
+ * @brief CloudflareScraper::checkForGoogleV8
+ * @throws CloudflareException if google_v8 hasn't been found
  */
-void CloudflareScraper::follow_replies(QNetworkReply* reply){
+void CloudflareScraper::checkForGoogleV8(){
 
-}
-
-void CloudflareScraper::gotResponse(QNetworkReply* reply){
-
-    disconnect(m_am, 0, 0, 0);
-
-    int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    auto locationHeader = reply->header(QNetworkRequest::LocationHeader);
-
-    if(locationHeader.isValid()){ // If the location header exists, we have to redirect
-        QUrl dest{reply->header(QNetworkRequest::LocationHeader).toUrl()};
-        Logger::warn(QString::number(code) + " redirect : " + dest.toString());
-        if(dest.toString().isEmpty()){
-            m_busy = false;
-            emit error();
-            return;
-        }
-
-        get(dest, true);
-        return;
-    }
-
-    QByteArray const content = reply->readAll();
-
-    if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 503
-            && content.contains("jschl_vc") && content.contains("jschl_answer")){
-        Logger::log(DEBUG, "It is secured with cloudflare !");
-        Logger::log(DEBUG, "Bypassing...");
-        hack(reply->url(), content);
-    }else{
-        Logger::log(DEBUG, "It is NOT secured !");
-        m_busy = false;
-        emit success(reply, content);
-    }
-
-}
-
-QString CloudflareScraper::getJSAlgorithm(QByteArray const &raw){
-    QRegExp reg("setTimeout\\(function\\(\\)\\{\\s+(var s,t,o,p,b,r,e,a,k,i,n,g,f.+\\r?\\n[\\s\\S]+a\\.value =.+)\\r?\\n");
-    reg.setMinimal(true);
-    reg.indexIn(raw, 0);
-    QString first{reg.cap(1)};
-
-    QRegularExpression r("a\\.value = (parseInt\\(.+\\)).+");
-    //r.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
-
-    QRegularExpression r2("\\s{3,}[a-z](?: = |\\.).+");
-
-    first = first.replace(r, "res=\\1");
-    first = first.replace(r2, "");
-    //first = first.replace("[\\n\\\\']", "");
-
-    return first;
-}
-
-QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
-    auto process = QPointer<QProcess> (new QProcess(this));
+    if(!_google_v8.isEmpty()) return;
 
     QList<QDir> whereToFind;
     whereToFind.append(_v8_path);
@@ -186,23 +133,87 @@ QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
         throw CloudflareException{QString{"Google v8 not found"}.toStdString()};
     }
 
+    _google_v8 = google_v8;
+}
+
+/**
+ * Connect every reply and emit error when error signal is emitted
+ * @brief follow_replies
+ */
+void CloudflareScraper::follow_replies(QNetworkReply* reply){
+
+}
+
+void CloudflareScraper::gotResponse(QNetworkReply* reply){
+
+    disconnect(m_am, 0, 0, 0);
+
+    int code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    auto locationHeader = reply->header(QNetworkRequest::LocationHeader);
+
+    if(locationHeader.isValid()){ // If the location header exists, we have to redirect
+        QUrl dest{locationHeader.toUrl()};
+        Logger::warn(QString::number(code) + " redirect : " + dest.toString());
+        if(dest.toString().isEmpty()){
+            m_busy = false;
+            emit error(QString{}, true);
+            return;
+        }
+
+        get(dest, true);
+        return;
+    }
+
+    QByteArray const content = reply->readAll();
+
+    if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 503
+            && content.contains("jschl_vc") && content.contains("jschl_answer")){
+        Logger::log(DEBUG, "It is secured with cloudflare !");
+        Logger::log(DEBUG, "Bypassing...");
+        hack(reply->url(), content);
+    }else{
+        Logger::log(DEBUG, "It is NOT secured !");
+        m_busy = false;
+        emit success(reply, content);
+    }
+
+}
+
+QString CloudflareScraper::getJSAlgorithm(QByteArray const &raw){
+    QRegExp reg("setTimeout\\(function\\(\\)\\{\\s+(var s,t,o,p,b,r,e,a,k,i,n,g,f.+\\r?\\n[\\s\\S]+a\\.value =.+)\\r?\\n");
+    reg.setMinimal(true);
+    reg.indexIn(raw, 0);
+    QString first{reg.cap(1)};
+
+    QRegularExpression r("a\\.value = (parseInt\\(.+\\)).+");
+
+    QRegularExpression r2("\\s{3,}[a-z](?: = |\\.).+");
+
+    first = first.replace(r, "res=\\1");
+    first = first.replace(r2, "");
+
+    return first;
+}
+
+QPointer<QProcess> CloudflareScraper::evalJS(QString const &js){
+    QPointer<QProcess> process(new QProcess(this));
+
     QStringList args; args << "-e" << js + ";print(res);";
 
     connect(process, &QProcess::readyReadStandardOutput, [process, this](){
         m_secret_token = process->readAllStandardOutput().trimmed().toLong();
     });
-    process->start(google_v8, args);
+    process->start(_google_v8, args);
     return process;
 }
 
 void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     QThread::sleep(5);
 
-    QString final_url = QString{"%1://%2/cdn-cgi/l/chk_jschl"}.arg(url.scheme()).arg(url.host());
-    QString host = url.host();
+    QString final_url{QString{"%1://%2/cdn-cgi/l/chk_jschl"}.arg(url.scheme()).arg(url.host())};
+    QString host{url.host()};
 
-
-    QString js_eval = getJSAlgorithm(resp);
+    QString js_eval{getJSAlgorithm(resp)};
 
     auto proc = evalJS(js_eval);
 
@@ -219,12 +230,12 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     QString pass = regex.cap(1);
 
     if(jschl_vc.isEmpty() || pass.isEmpty()){
-        throw CloudflareException{"Unexpected exception, maybe cloudflare's changed its method"};
+        emit error("Unexpected exception, maybe cloudflare's changed its method");
     }
 
     QNetworkCookie const* cfduid_cookie = m_cookies->getCookie("__cfduid");
     if(cfduid_cookie == 0){
-        throw CloudflareException{"Didn't get __cfduid cookie"};
+        emit error("Didn't get __cfduid cookie");
     }
 
     m_secret_token += host.length();
@@ -237,7 +248,6 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     r.setHeader(QNetworkRequest::UserAgentHeader, getUA());
     r.setRawHeader("Referer", url.toString().toUtf8());
     r.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
 
     Logger::log(DEBUG, "GET : " + r.url().toString());
 
@@ -257,7 +267,7 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
 
         if(!endCookie){
             Logger::log(ERROR, "Didn't get cf_clearance, failed");
-            emit error();
+            emit error("Didn't get cf_clearance", true);
         }
 
 
