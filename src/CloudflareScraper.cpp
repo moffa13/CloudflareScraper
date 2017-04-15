@@ -234,7 +234,7 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
     }
 
     QNetworkCookie const* cfduid_cookie = m_cookies->getCookie("__cfduid");
-    if(cfduid_cookie == 0){
+    if(cfduid_cookie == nullptr){
         emit error("Didn't get __cfduid cookie");
     }
 
@@ -255,21 +255,13 @@ void CloudflareScraper::hack(QUrl const &url, QByteArray const& resp){
 
         disconnect(m_am, 0, 0, 0);
 
-        bool endCookie{false};
-
-        for(auto cookie : m_cookies->getAllCookies()){
-            if(cookie.name() == "cf_clearance"){
-                endCookie = true;
-                Logger::log(DEBUG, "GOT cf_clearance, OK");
-                break;
-            }
-        }
-
-        if(!endCookie){
+        QNetworkCookie const* cfclearance_cookie = m_cookies->getCookie("cf_clearance");
+        if(cfclearance_cookie != nullptr){
+            Logger::log(DEBUG, "GOT cf_clearance, OK");
+        }else{
             Logger::log(ERROR, "Didn't get cf_clearance, failed");
             emit error("Didn't get cf_clearance", true);
         }
-
 
         get(url, true); // Now we've got the cookies, we call again the get method but this time it will directly return content
 
