@@ -27,6 +27,7 @@ class CloudflareScraper : public QObject
     public:
         CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir(QCoreApplication::applicationDirPath()));
         CloudflareScraper(CloudflareScraper const& rhs);
+        CloudflareScraper& operator=(CloudflareScraper const& rhs);
         inline void addUA(QString const& ua, bool update = true){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
         inline void removeUA(QString const& ua, bool update = true) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }
         void setUA(QString const& ua, bool add = false);
