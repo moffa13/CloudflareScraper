@@ -66,11 +66,20 @@ void CloudflareScraper::setUA(QString const& ua, bool add){
 }
 
 CloudflareScraper::CloudflareScraper(CloudflareScraper const& rhs) : CloudflareScraper(){
-
     _current_ua = rhs._current_ua;
     Cookies *c = new Cookies(this);
     c->setAllCookies(rhs.getCookies()->getAllCookies());
     setCookies(c);
+}
+
+CloudflareScraper& CloudflareScraper::operator =(CloudflareScraper const &rhs){
+    if(&rhs != this){
+        _current_ua = rhs._current_ua;
+        Cookies *c = new Cookies(this);
+        c->setAllCookies(rhs.getCookies()->getAllCookies());
+        setCookies(c);
+    }
+    return *this;
 }
 
 void CloudflareScraper::get(QUrl const &url, bool force){
