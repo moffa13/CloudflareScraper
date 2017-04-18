@@ -4,6 +4,8 @@
 #include <exception>
 #include <stdexcept>
 
+// Lol
+
 class CloudflareException : public std::exception
 {
     public:
