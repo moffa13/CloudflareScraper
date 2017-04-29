@@ -9,6 +9,8 @@ using namespace std;
 
 int Logger::_log_level = DEBUG;
 
+DLL_API inline void Logger::setLogLevel(int level){ _log_level = level; }
+
 void Logger::write(QString const &prefix, QString const &message, int act){
 
     QString string;

@@ -7,6 +7,8 @@
     #else
         #define DLL_API Q_DECL_EXPORT
     #endif
+#else
+    #define DLL_API
 #endif
 
 #endif // CLOUDFLARESCRAPER_EXPORT_H

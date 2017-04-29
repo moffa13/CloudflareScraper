@@ -5,3 +5,6 @@ src/release
 src/bin/*
 src/.qmake.stash
 build-*
+Makefile*
+bin
+build

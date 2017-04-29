@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
     v8_base.cd("linux");
 #endif
 
-    CloudflareScraper::setLogLevel(ERROR);
+    Logger::setLogLevel(ERROR);
     CloudflareScraper scraper{c, nullptr, v8_base};
 
     QObject::connect(&scraper, &CloudflareScraper::success, [c](QNetworkReply* reply, QByteArray const& content){
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
 
     QObject::connect(&scraper, &CloudflareScraper::error, [c](QString const& msg, bool recoverable){
         if(!recoverable){
-            Logger::error("Unrecoverable error : " + msg);
+            Logger::log(ERROR, "Unrecoverable error : " + msg);
             qApp->exit(2);
         }
     });
@@ -43,12 +43,12 @@ int main(int argc, char* argv[]){
             try{
                scraper.get(QUrl(argv[1]));
             }catch(CloudflareException &ex){
-                Logger::error(QString("Unrecoverable error : ") + ex.what());
+                Logger::log(ERROR, QString("Unrecoverable error : ") + ex.what());
                 qApp->exit(2);
             }
         }
         else{
-            Logger::error("No url specified, please use CloudflareScraper.exe <url>");
+            Logger::log(ERROR, "No url specified, please use CloudflareScraper.exe <url>");
             qApp->exit(1);
         }
     });

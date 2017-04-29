@@ -3,6 +3,7 @@
 
 #include <QDateTime>
 #include <QString>
+#include "CloudflareScraper_export.h"
 
 enum ACTION{
     ERASE = 1,
@@ -27,12 +28,12 @@ class Logger
         static inline QString getDateFormatted(){
             return Logger::getDateTime().toString("yyyy-MM-dd hh:mm:ss");
         }
-        static inline void setLogLevel(int level){ _log_level = level; }
         static void write(QString const &prefix, QString const &message, int act);
         static void error(QString const &message, int act = PRINT);
         static void warn(QString const &message, int act = PRINT);
         static void debug(QString const &message, int act = PRINT);
         static void log(int log_level, QString const& message, int act = PRINT);
+        DLL_API static inline void setLogLevel(int level);
     private:
         static int _log_level;
 };

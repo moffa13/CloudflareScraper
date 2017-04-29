@@ -1,9 +1,9 @@
 #ifndef CLOUDFLARESCRAPER_H
 #define CLOUDFLARESCRAPER_H
 
+#include "Logger.h"
 #include "CloudflareScraper_export.h"
 #include "Cookies.h"
-#include "Logger.h"
 #include <memory>
 #include <QByteArray>
 #include <QCoreApplication>
@@ -15,11 +15,7 @@
 #include <QProcess>
 #include <QString>
 
-#ifndef NO_DLL
 class DLL_API CloudflareScraper : public QObject
-#else
-class CloudflareScraper : public QObject
-#endif
 {
 
     Q_OBJECT
@@ -28,8 +24,6 @@ class CloudflareScraper : public QObject
         CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir(QCoreApplication::applicationDirPath()));
         CloudflareScraper(CloudflareScraper const& rhs);
         CloudflareScraper& operator=(CloudflareScraper const& rhs);
-        inline void addUA(QString const& ua, bool update = true){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
-        inline void removeUA(QString const& ua, bool update = true) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }
         void setUA(QString const& ua, bool add = false);
         void get(QUrl const &url, bool force = false);
         inline void get() { get(m_last_url); }
@@ -40,7 +34,8 @@ class CloudflareScraper : public QObject
         }
         inline QPointer<Cookies> getCookies() const { return m_cookies; }
         inline bool isBusy() const { return m_busy; }
-        static inline void setLogLevel(int level) { Logger::setLogLevel(level); }
+        inline void addUA(QString const& ua, bool update = true);
+        inline void removeUA(QString const& ua, bool update = true);
     private:
         static QSet<QString> RANDOM_UA_LIST;
         QString _current_ua;

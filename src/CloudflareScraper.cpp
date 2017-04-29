@@ -1,6 +1,6 @@
+#include "Logger.h"
 #include "CloudflareScraper.h"
 #include "CloudflareException.h"
-#include "Logger.h"
 #include <algorithm>
 #include <ctime>
 #include <iterator>
@@ -23,6 +23,9 @@ QSet<QString> CloudflareScraper::RANDOM_UA_LIST = {
     "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
     "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"
 };
+
+inline void CloudflareScraper::addUA(QString const& ua, bool update){ RANDOM_UA_LIST.insert(ua); if(update) setRandomUA(); }
+inline void CloudflareScraper::removeUA(QString const& ua, bool update) { RANDOM_UA_LIST.remove(ua); if(update) setRandomUA(); }
 
 /**
  * Returns a number between a and b, which are included
