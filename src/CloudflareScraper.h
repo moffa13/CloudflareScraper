@@ -21,7 +21,7 @@ class DLL_API CloudflareScraper : public QObject
     Q_OBJECT
 
     public:
-        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir(QCoreApplication::applicationDirPath()));
+        CloudflareScraper(Cookies *cookies = nullptr, QObject *parent = nullptr, QDir const& v8_path = QDir{});
         CloudflareScraper(CloudflareScraper const& rhs);
         CloudflareScraper& operator=(CloudflareScraper const& rhs);
         void setUA(QString const& ua, bool add = false);
