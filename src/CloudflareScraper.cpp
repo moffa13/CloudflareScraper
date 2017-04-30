@@ -117,7 +117,7 @@ void CloudflareScraper::checkForGoogleV8(){
 
     QList<QDir> whereToFind;
     whereToFind.append(_v8_path);
-    whereToFind.append(QDir(qApp->applicationDirPath()));
+    whereToFind.append(QDir(QCoreApplication::instance()->applicationDirPath()));
 
     bool found = false;
     QString google_v8;

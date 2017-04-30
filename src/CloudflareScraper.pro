@@ -2,6 +2,7 @@ QT -= gui
 QT += network
 
 TARGET = CloudflareScraper
+CONFIG -= debug_and_release
 
 
 DEFINES += DLL_EXPORT
@@ -9,16 +10,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 contains(DEFINES, NO_DLL){
     TEMPLATE = app
-    DESTDIR = bin
+    DESTDIR = $$PWD/../bin
 }else{
     TEMPLATE = lib
-    DESTDIR = bin/lib
+    DESTDIR = $$PWD/../bin/lib
 }
 
 CONFIG += c++11 console
 
-OBJECTS_DIR = build
-MOC_DIR = build
+OBJECTS_DIR = $$PWD/../build
+MOC_DIR = $$PWD/../build
 
 SOURCES += $$PWD/CloudflareScraper.cpp \
         $$PWD/Cookies.cpp \
