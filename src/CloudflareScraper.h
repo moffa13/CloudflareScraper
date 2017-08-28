@@ -15,6 +15,10 @@
 #include <QProcess>
 #include <QString>
 
+typedef struct{
+    ulong ping;
+} req_infos;
+
 class DLL_API CloudflareScraper : public QObject
 {
 
@@ -48,6 +52,7 @@ class DLL_API CloudflareScraper : public QObject
         QPointer<Cookies> m_cookies;
         bool m_follow_redirects = true;
         long m_secret_token = 0;
+        time_t m_requested_at;
         QString getUA() const;
         QPointer<QProcess> evalJS(QString const &js);
         void hack(QUrl const &url, QByteArray const& resp);
@@ -55,8 +60,9 @@ class DLL_API CloudflareScraper : public QObject
         QString getJSAlgorithm(QByteArray const &raw);
         QString _google_v8;
         static unsigned random(unsigned a, unsigned b);
-    Q_SIGNALS:
-        void success(QNetworkReply*, QByteArray const &content);
+        req_infos getPing();
+Q_SIGNALS:
+        void success(QNetworkReply*, QByteArray const &content, req_infos const& infos = req_infos{});
         void error(QString const& msg = QString(), bool recoverable = false);
     private Q_SLOTS:
         void gotResponse(QNetworkReply*);

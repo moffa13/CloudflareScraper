@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
     v8_base.cd("linux");
 #endif
 
-    Logger::setLogLevel(ERROR);
+   // Logger::setLogLevel(ERROR);
     CloudflareScraper scraper{c, nullptr, v8_base};
 
     QObject::connect(&scraper, &CloudflareScraper::success, [c](QNetworkReply* reply, QByteArray const& content){

@@ -94,6 +94,8 @@ void CloudflareScraper::get(QUrl const &url, bool force){
 
     if(m_busy && !force) return; // Do not accept requests while still processing one
 
+    m_requested_at = std::time(nullptr);
+
     m_busy = true;
     m_last_url = url;
 
@@ -186,9 +188,15 @@ void CloudflareScraper::gotResponse(QNetworkReply* reply){
     }else{
         Logger::log(DEBUG, "It is NOT secured !");
         m_busy = false;
-        emit success(reply, content);
+        emit success(reply, content, getPing());
     }
 
+}
+
+req_infos CloudflareScraper::getPing(){
+    req_infos infos;
+    infos.ping = time(nullptr) - m_requested_at;
+    return infos;
 }
 
 QString CloudflareScraper::getJSAlgorithm(QByteArray const &raw){
